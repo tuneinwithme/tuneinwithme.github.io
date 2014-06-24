@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+coffee --watch --output ./scripts --compile src/coffee/main.coffee &
+sass   --watch ./src/sass/style.sass:./styles/style.css &
+
+# python -m SimpleHTTPServer
+python server.py
+
