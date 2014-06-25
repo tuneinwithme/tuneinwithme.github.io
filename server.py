@@ -5,8 +5,8 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 class TuneinwithmeHandler(SimpleHTTPRequestHandler):
     @property
-    def error_message_format():
-      with file('index.html', 'r') as f:
+    def error_message_format(self):
+      with file('404.html', 'r') as f:
         return f.read()
 
 try: test(TuneinwithmeHandler, HTTPServer)
