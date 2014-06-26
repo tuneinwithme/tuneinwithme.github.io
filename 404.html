@@ -7,30 +7,60 @@
   <script type="text/javascript" src="/scripts/vendor/firebase-1.0.15.js"></script>
   <!-- <script type="text/javascript" src="/scripts/main.js"></script> -->
   <script type="text/javascript" src="/scripts/vendor/coffee-script.js"></script>
+  <script type="text/coffeescript" src="/src/coffee/utils.coffee"></script>
+  <script type="text/coffeescript" src="/src/coffee/song.coffee"></script>
+  <script type="text/coffeescript" src="/src/coffee/room.coffee"></script>
+  <script type="text/coffeescript" src="/src/coffee/view.coffee"></script>
   <script type="text/coffeescript" src="/src/coffee/main.coffee"></script>
 </head>
 <body>
 
-<div id="albumContainer">
-  <img class="album" id="albumimage" alt="sample">
-  <div id="titleContainer"></div>
-</div>
+  <div class="background-album-art"></div>
 
-<form role="form">
-  <div class="form-group">
-    <label for="input">Room ID</label>
-    <input type="text" class="form-control flasher" id="roominput" placeholder="room:&hellip;">
-  </div>
-  <button type="submit" id="submitRoom" class="btn btn-default">Change Room</button>
-</form>
+  <div class="row">
+  <div class="col-md-5">
 
-<form role="form">
-  <div class="form-group">
-    <label for="input">Song Spotify URL</label>
-    <input type="text" class="form-control flasher" id="songinput" placeholder="spotify:track:&hellip;">
+  <div class="row">
+    <div class="col-md-12 album-container">
+
+      <img class="album-art"
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+      <div class="song-title lead"><br></div>
+      <div class="song-artist"><br></div>
+      <div class="song-album"><br></div>
+
+    </div>
   </div>
-  <button type="submit" id="submitSong" class="btn btn-default">Submit Song</button>
-</form>
+
+  </div>
+  <div class="col-md-5">
+
+  <form class="row room-form js-room-form">
+    <span class="col-md-3">
+      <label>Room ID</label>
+    </span>
+    <span class="col-md-7">
+      <input type="text" class="form-control flasher js-input-room" placeholder="room:&hellip;">
+    </span>
+    <span class="col-md-2">
+      <button type="submit" class="btn btn-default js-submit-room">Change Room</button>
+    </span>
+  </form>
+
+  <form class="row song-form js-song-form">
+    <span class="col-md-3">
+      <label>Song ID</label>
+    </span>
+    <span class="col-md-7">
+      <input type="text" class="form-control flasher js-input-song" placeholder="song:&hellip;">
+    </span>
+    <span class="col-md-2">
+      <button type="submit" class="btn btn-default js-submit-song">Change Song</button>
+    </span>
+  </form>
+
+  </div>
+  </div>
 
 </body>
 </html>

@@ -1,22 +1,26 @@
 @import "bootstrap"
 
+html
+  height: 100%
+
 body
   background: black
+  height: 100%
+  position: relative
+  padding: 2em
 
-
-img.album
-  max-width: 400px
-
-#albumContainer
-  max-width: 400px
-  margin-left: auto
-  margin-right: auto
+.album-container
   text-align: center
-  color: white
-  font-family: Lucida Sans Unicode
-  font-size: 26px
-  padding-bottom: 15px
-  //background-color: #90FFB7;
+
+.album-art
+  background-color: white
+  margin: 0 auto
+  display: block
+  box-shadow: 1px 1px 2px 2px #505050
+  width: 100%
+  // height: 400px
+  // width: 400px
+  padding: 5px
 
 .form-control.flasher
   background-color: white
@@ -26,3 +30,29 @@ img.album
     background-color: #FFE68F
     -webkit-transition: background-color 0s linear
     transition: background-color 0s linear
+
+.song-title
+  color: white
+
+// http://stackoverflow.com/questions/20039765
+.background-album-art
+  transition: background 0.1s linear
+  position: absolute
+  left: 0
+  right: 0
+  top: 0
+  bottom: 0
+  z-index: -1
+  
+  display: block
+  background-image: url('http://666a658c624a3c03a6b2-25cda059d975d2f318c03e90bcf17c40.r92.cf1.rackcdn.com/unsplash_527bf56961712_1.JPG')
+  background-size: cover
+  background-position: center
+  
+  opacity: 0.6
+  -webkit-filter: blur(60px)
+  -moz-filter: blur(60px)
+  -o-filter: blur(60px)
+  -ms-filter: blur(60px)
+  filter: blur(60px)
+  overflow: hidden
