@@ -1,8 +1,42 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 
-coffee --watch --output ./scripts --compile src/coffee/main.coffee &
-sass   --watch ./src/sass/style.sass:./styles/style.css &
+from time import sleep
 
-# python -m SimpleHTTPServer
-python server.py
+COMPILE_COFFEE = False
 
+
+def shell(cmd, ps):
+    from subprocess import Popen
+    print '+ $', cmd,
+    p = Popen(cmd, shell=True)
+    print '[PID %d]' % p.pid
+    ps.append(p)
+
+
+def server():
+    import sys
+    oldsetting = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True
+    import server
+    sys.dont_write_bytecode = oldsetting
+    print '+ >>>', 'server.server()'
+    server.server()
+
+
+def main():
+    try:
+        ps = []
+        shell('sass --watch ./src/sass/style.sass:./styles/style.css', ps)
+        if COMPILE_COFFEE:
+            shell('coffee --watch --output ./scripts --compile src/coffee/main.coffee', ps)
+        server()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        print '\nExiting...'
+        for p in ps: p.terminate()
+        sleep(0.3)
+        for p in ps: p.kill()
+
+if __name__ == '__main__':
+    main()
