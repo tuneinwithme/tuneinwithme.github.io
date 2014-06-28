@@ -1,0 +1,42 @@
+doctype html5
+html
+  head
+    title tuneinwith.me
+    link(rel='stylesheet', type='text/css', href='/assets/styles/style.css')
+    script(type='text/javascript', src='/assets/scripts/vendor/jquery-2.1.1.min.js')
+    script(type='text/javascript', src='/assets/scripts/vendor/firebase-1.0.15.js')
+    //- <script type="text/javascript" src="/assets/scripts/main.js"></script> 
+    script(type='text/javascript', src='/assets/scripts/vendor/coffee-script.js')
+    script(type='text/coffeescript', src='/src/coffee/utils.coffee')
+    script(type='text/coffeescript', src='/src/coffee/song.coffee')
+    script(type='text/coffeescript', src='/src/coffee/room.coffee')
+    script(type='text/coffeescript', src='/src/coffee/view.coffee')
+    script(type='text/coffeescript', src='/src/coffee/main.coffee')
+  body
+    .background-album-art
+    .row
+      .col-md-5
+        .row
+          .col-md-12.album-container
+            img.album-art(src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
+            .song-title.lead
+              br
+            .song-artist
+              br
+            .song-album
+              br
+      .col-md-5
+        form.row.room-form.js-room-form
+          span.col-md-3
+            label Room ID
+          span.col-md-7
+            input.form-control.flasher.js-input-room(type='text', placeholder='room:…')
+          span.col-md-2
+            button.btn.btn-default.js-submit-room(type='submit') Change Room
+        form.row.song-form.js-song-form
+          span.col-md-3
+            label Song ID
+          span.col-md-7
+            input.form-control.flasher.js-input-song(type='text', placeholder='song:…')
+          span.col-md-2
+            button.btn.btn-default.js-submit-song(type='submit') Change Song

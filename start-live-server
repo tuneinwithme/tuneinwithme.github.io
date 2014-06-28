@@ -26,17 +26,21 @@ def server():
 def main():
     try:
         ps = []
-        shell('sass --watch ./src/sass/style.sass:./styles/style.css', ps)
+        shell('sass --watch ./src/sass/style.sass:./assets/styles/style.css', ps)
+        shell('jade --watch -o ./views ./src/jade', ps)
         if COMPILE_COFFEE:
-            shell('coffee --watch --output ./scripts --compile src/coffee/main.coffee', ps)
+            shell('coffee --watch --output ./assets/scripts --compile ./src/coffee/main.coffee', ps)
         server()
     except KeyboardInterrupt:
         pass
     finally:
-        print '\nExiting...'
+        print
+        print 'Sending all processes the TERM signal...'
         for p in ps: p.terminate()
         sleep(0.3)
+        print 'Sending all processes the KILL signal...'
         for p in ps: p.kill()
+        print 'Server stopped.'
 
 if __name__ == '__main__':
     main()
