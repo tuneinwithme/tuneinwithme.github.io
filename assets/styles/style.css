@@ -5001,6 +5001,7 @@ body {
   display: block;
   box-shadow: 1px 1px 2px 2px #505050;
   width: 100%;
+  max-width: 100vmin;
   padding: 5px; }
 
 .form-control.flasher {
