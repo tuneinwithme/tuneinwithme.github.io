@@ -1,69 +1,75 @@
+'use strict'
 app = window.Tuneinwithme
 
 class app.Song extends app.Base
   init: (@id) ->
     @fetchedInfo = false
+    @shortId = @id.replace('spotify:track:', '')
 
-    @on 'focus', =>
-      return if @ == @class.current
+    @on 'focus', (thread) =>
+      return thread.continue()  if @ == @class.current
       @class.previous = @class.current
       @class.current = @
-      @class.previous?.trigger 'blur'
-      app.Room.current.trigger 'change-song'
-      app.view.trigger 'change-song'
-
+      thread.stackAndContinue [
+        =>
+            if @class.previous  then @class.previous.trigger thread, 'blur'
+            else thread.continue()
+        =>
+            app.Room.current.trigger thread, 'change-song'
+        =>
+            app.view.trigger thread, 'change-song'
+      ]
       console.log "song: new! #{@id}"
 
-    @on 'blur', =>
-      @abortFetch
+    @on 'blur', (thread) =>
+      @abortFetch thread
 
-  abortFetch: (callback) ->
-    @fetching?.abort()
+  abortFetch: (thread) ->
+    @fetchRequest?.abort()
+    thread.continue()
 
-  fetchInfo: (callback) ->
-    if @fetchedInfo
-      callback()
+  fetchInfo: (thread) ->
+    if @fetchedInfo  then thread.continue()
     else
       @abortFetch
-      url = 'https://api.spotify.com/v1/tracks?' + $.param {ids: @id.replace('spotify:track:', '')}
-      # url = 'https://embed.spotify.com/oembed/?callback=?&' +
-      @fetching = $.getJSON url, (data) =>
+      url = 'https://api.spotify.com/v1/tracks?' + $.param {ids: @shortId}
+      @fetchRequest = $.getJSON url, (data) =>
         track = data['tracks'][0]
         @image = track['album']['images'][0]['url']
         @thumbnail = track['album']['images'][2]['url']
         @albumName = track['album']['name']
         @artistName = track['artists'][0]['name']
         @name = track['name']
-        # @thumbnail = data.thumbnail_url.replace('/cover/', '/640/')
-        # @title = data.title
         @fetchedInfo = true
-        callback()
+        thread.continue()
+
+  # class methods
 
   @all: {}
 
   @get: (id) =>
-    unless id of @all
-      @all[id] = new @(id)
+    unless id of @all  then @all[id] = new @(id)
     @all[id]
 
-  @search: (input, callback) =>
-    @searchReturningId input, (id) =>
-      callback @get id
+  @search: (thread, input) =>
+    thread.stackAndContinue [
+      =>
+        @searchGettingId thread, input
+      (id) =>
+        thread.continue @get id
+    ]
 
-  @searchReturningId: (input, callback) ->
+  @searchGettingId: (thread, input) =>
     if input.search(/^spotify:track:/) == 0
-      callback input
-      return
-    m = input.match(/open.spotify.com\/track\/(\w+)/)
-    if m
-      callback 'spotify:track:' + m[1]
-      return
+      return thread.continue input
+    else if (m = input.match(/open.spotify.com\/track\/(\w+)/))
+      return thread.continue 'spotify:track:' + m[1]
     url = 'http://ws.spotify.com/search/1/track.json?' + $.param {q: input}
     $.getJSON url, (data) ->
       if data.tracks[0]
-        callback data.tracks[0].href
+        return thread.continue data.tracks[0].href
       else
-        console.error "No sound found for query \"#{input}\""
+        throw new Error "No sound found for query \"#{input}\""
 
   @current: null
   @previous: null

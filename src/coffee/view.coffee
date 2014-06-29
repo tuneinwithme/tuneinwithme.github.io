@@ -1,72 +1,86 @@
+'use strict'
 app = window.Tuneinwithme
 
 class View extends app.Base
 
   init: ->
-    @on 'ready', =>
+
+    @on 'ready', (thread) =>
       @bindControls()
-      @goToUrlSuggestedRoom()
+      @goToUrlSuggestedRoom thread
 
-    @on 'change-song', =>
+    @on 'change-song', (thread) =>
       song = app.Song.current
-      song.fetchInfo =>
-        @updateInputIfNecessary('.js-input-song', "#{song.name} (#{song.id})")
-        $('.album-art').attr 'src', song.image
-        $('.background-album-art').css 'background-image', "url(#{song.thumbnail})"
-        $('.song-title').text song.name
-        $('.song-artist').text song.artistName
-        $('.song-album').text song.albumName
+      thread.stackAndContinue [
+        =>
+          song.fetchInfo thread
+        =>
+          @updateInputIfNecessary('.js-input-song', "#{song.name} (#{song.id})")
+          $('.album-art').attr 'src', song.image
+          $('.background-album-art').css 'background-image', "url(#{song.thumbnail})"
+          $('.song-title').text song.name
+          $('.song-artist').text song.artistName
+          $('.song-album').text song.albumName
+          thread.continue()
+      ]
 
-    @on 'change-room', =>
+    @on 'submit-song', (thread) =>
+      @searchAndChangeSong thread, $('.js-input-song').select().val()
+
+    @on 'submit-room', (thread) =>
+      @changeRoomById thread, $('.js-input-room').select().val()
+
+    @on 'change-room', (thread) =>
       room = app.Room.current
       @updateInputIfNecessary('.js-input-room', room.id)
-      @urlSuggestedRoom (oldRoom) =>
-        if oldRoom != room
-          history.pushState({id: room.id}, '', room.id)
+      oldRoom = @urlSuggestedRoom()
+      if oldRoom != room
+        history.pushState({id: room.id}, '', room.id)
+      thread.continue()
 
-  onControl: (selector, event, callback) ->
-    $(selector).on event, (evt) ->
+    @on 'change-url', (thread) =>
+      @goToUrlSuggestedRoom thread
+
+  # Binds events to the DOM. Only View should do this.
+  onControl: (selector, event, trigger) ->
+    $(selector).on event, (evt) =>
       evt.preventDefault()
-      callback()
+      @triggerThread trigger
 
   bindControls: ->
-    submitSong = => @searchAndChangeSong $('.js-input-song').select().val()
-    submitRoom = => @changeRoomById $('.js-input-room').select().val()
-    @onControl '.js-submit-song', 'click', submitSong
-    @onControl '.js-submit-room', 'click', submitRoom
-    @onControl '.js-form-song', 'submit', submitSong
-    @onControl '.js-form-room', 'submit', submitRoom
+    @onControl '.js-submit-song', 'click', 'submit-song'
+    @onControl '.js-submit-room', 'click', 'submit-room'
+    @onControl '.js-form-song', 'submit', 'submit-song'
+    @onControl '.js-form-room', 'submit', 'submit-room'
+    @onControl window, 'popstate', 'change-url'
 
-    @onControl window, 'popstate', @goToUrlSuggestedRoom
+  changeRoomById: (thread, id) ->
+    app.Room.get(id).trigger thread, 'focus'
 
+  searchAndChangeSong: (thread, input) ->
+    thread.stackAndContinue [
+      =>
+        app.Song.search thread, input
+      (song) =>
+        song.trigger thread, 'focus'
+    ]
 
-  changeRoomById: (id) ->
-    app.Room.get(id).trigger 'focus'
-
-  searchAndChangeSong: (input) ->
-    app.Song.search input, (song) ->
-      song.trigger 'focus'
-
-  goToUrlSuggestedRoom: =>
-    @urlSuggestedRoom (room) ->
-      room.trigger 'focus'
+  goToUrlSuggestedRoom: (thread) ->
+    @urlSuggestedRoom().trigger thread, 'focus'
     $('.js-autofocus').select()
 
   updateInputIfNecessary: (selector, value) ->
     $el = $(selector)
-    unless $el.val() is value
-      $el.val value
+    $el.val value  unless $el.val() is value
     $el.addClass 'flash'
     setTimeout ->
       $el.removeClass 'flash'
     , 0
     $el
 
-  urlSuggestedRoom: (callback) ->
-    id = $(location).attr('pathname').slice 1
-    if id.length > 0
-      callback app.Room.get id
-    else
-      console.error 'url does not suggest default room'
+  urlSuggestedRoom: ->
+    roomId = $(location).attr('pathname').slice 1
+    if roomId.length > 0 then return app.Room.get roomId
+    else throw new Error 'URL does not suggest default room'
 
 app.view = new View
