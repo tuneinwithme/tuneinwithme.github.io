@@ -22,7 +22,7 @@ HTML_LOC = $(ROOT)/views
 HTML_FILES = $(addprefix $(HTML_LOC)/,$(notdir $(JADE_FILES:.jade=.html)))
 
 
-all: $(JS_BUILT) $(CSS_FILE) $(HTML_FILES)
+all: $(JS_BUILT) $(CSS_FILE) $(HTML_FILES) 404.html
 
 
 $(JS_BUILT): $(JS_FILES)
@@ -36,6 +36,9 @@ $(CSS_FILE): $(SASS_FILES)
 
 $(HTML_LOC)/%.html: $(JADE_LOC)/%.jade
 	jade -o $(HTML_LOC) $(JADE_LOC)
+
+404.html: $(HTML_LOC)/room.html
+	cp $(HTML_LOC)/room.html 404.html
 
 clean:
 	@rm -f $(CSS_FILE) $(ALL_JS_FILES) $(JS_BUILT)

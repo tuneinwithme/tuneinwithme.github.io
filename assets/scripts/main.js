@@ -14,7 +14,7 @@
     }
 
     Main.prototype.init = function() {
-      return app.view.trigger('ready');
+      return app.view.triggerThread('ready');
     };
 
     return Main;
